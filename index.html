@@ -67,6 +67,29 @@
             font-weight: 450;
         }
 
+        /* Scroll / parchment style for the translation */
+        .scroll {
+            background: #fef7e0;
+            padding: 1.8rem;
+            margin: 1rem 0 0.5rem;
+            border-radius: 12px;
+            border-left: 6px solid #b89a6b;
+            border-right: 2px solid #e0d5b5;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.02), 0 4px 12px rgba(0,0,0,0.05);
+            font-family: 'Georgia', 'Times New Roman', serif;
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #2c281f;
+        }
+
+        .scroll p {
+            margin-bottom: 1rem;
+        }
+
+        .scroll p:last-child {
+            margin-bottom: 0;
+        }
+
         .choices-area {
             padding: 1.2rem 1.8rem 2rem 1.8rem;
             background: #fefcf7;
@@ -110,6 +133,7 @@
         @media (max-width: 500px) {
             .story-text { font-size: 1rem; }
             .header h1 { font-size: 1rem; }
+            .scroll { font-size: 0.9rem; padding: 1.2rem; }
         }
     </style>
 </head>
@@ -165,7 +189,24 @@
     ];
     const allContexts = shuffleArray([...trueContexts, ...falseContexts]);
 
-    // ----- Full decision tree (with original side branches restored)
+    // ----- The authentic translation text
+    const translationText = `You begin to read the fragile papyrus. The ink has faded, but the words are still clear:
+
+"That the world was born without tongue is no accident of myth but a statement of method. Chaos did not suggest the earth. It demanded it. And so too must the laws that govern any realm — even one so modest as a game of cards played by candlelight or, as I suppose elsewhere, by the pale glow of a dying hearth — be understood not as suggestions offered in the spirit of friendship, but as edicts. Hard. Unyielding. Cut into the bones of the thing.
+
+I am especially severe on this point. I compare the player who ignores a rule to a man who, having been told the location of a door, chooses instead to walk into the wall beside it — not out of ignorance, but out of a kind of decorative stubbornness that benefits no one, least of all himself.
+
+And yet — and here I must pivot without warning, for the truth demands it — it is also true that Chaos did not specify everything. The earth was demanded, yes. But the colour of stones? The temperament of goats? The precise number of stars visible from any given hill in Boeotia on a night in late autumn, and whether the third star from the left is the same one that a shepherd named Damasios swore, in the autumn before last, had spoken to him in the voice of his dead uncle and told him to sell his flock and take to the sea? These things were left open. And what is left open is not a failure of law but its highest generosity.
+
+I draw here an analogy that later scholars will no doubt find difficult. I compare the unwritten spaces between rules to the silence between the notes of a lyre — not empty, but full of permission. The player who finds such a silence is not merely allowed but obligated to fill it with his own invention, provided — and here I return to my earlier severity — that his invention does not cause the lyre to sound as though it were being played by a man who has never heard music and suspects it of being a trap.
+
+The phrase I use, and I use it with full conviction, is this: all is permitted that does not offend the spirit of the song.
+
+There follows now a passage that I suspect will cause some obscurity, for I address you, reader, directly — unusual for a text of this kind, but I have never much cared for convention when it stands between a thought and its destination. I urge you to think outside the pithos, a phrase that I believe I have coined and that I expect will trouble translators for centuries to come. The pithos is the vessel in which all known things are stored, and from which the truly resourceful mind must occasionally escape. I suspect some future grammatikos will insist it is simply a joke. He will be unable to explain what is funny about it. This will be the funniest part.
+
+Go now. Read what has been written. Think on what has not. And where the text is silent, do not mistake its silence for absence. It is waiting for you to speak."`;
+
+    // ----- Decision tree (full, with restored side branches)
     const storyGraph = {
         start: {
             text: `As you enter the old stone house, ${DISPLAY_NAME} looks up from a pile of dusty scrolls. She adjusts her glasses. "A visitor? Rare. What brings you to Eleusis?"`,
@@ -204,11 +245,11 @@
             options: [{ label: "Leave in shame", next: "dismissed" }]
         },
         secret2: {
-            text: `She watches you write with your left hand while combing your hair with your right. Then she grimaces. "You're combing your hair in my study? Disgusting. Have you no manners? Ugh. I'll give you the translation, but only so you leave faster. Here: 'The yellow liquid is not to be drunk.' Now go."`,
+            text: `She watches you write with your left hand while combing your hair with your right. Then she grimaces. "You're combing your hair in my study? Disgusting. Have you no manners? Ugh. I'll give you the translation, but only so you leave faster. Here – take the scroll." She hands you a rolled parchment.`,
             options: [{ label: "Take the translation and leave", next: "translationSuccess" }]
         },
         secret3: {
-            text: `She stares at you blankly. "I don't care. That's not remotely interesting. Children swallow coins all the time. But fine, a secret is a secret. The translation: 'Do not trust a man who sells olive oil from a blue barrel.' There. Happy?"`,
+            text: `She stares at you blankly. "I don't care. That's not remotely interesting. Children swallow coins all the time. But fine, a secret is a secret. Here's your translation." She pushes a dusty scroll across the table.`,
             options: [{ label: "Take the translation and leave", next: "translationSuccess" }]
         },
         secret4: {
@@ -216,16 +257,21 @@
             options: [{ label: "Flee", next: "dismissed" }]
         },
         secret5: {
-            text: `She rolls her eyes. "That's not even a secret. That's just a dietary preference. Whatever. I'm bored. Here's your translation: 'The fish remembers the hook.' Now please leave me alone."`,
+            text: `She rolls her eyes. "That's not even a secret. That's just a dietary preference. Whatever. I'm bored. Here's your translation." She tosses a parchment in your direction. "Now please leave me alone."`,
             options: [{ label: "Take the translation and leave", next: "translationSuccess" }]
         },
         secret6: {
-            text: `For the first time, she laughs. "Bunnies? My goats are named *Tzitziki* and *Kleftiko*. They would eat your Schnuckel and Hasi for breakfast. But I like you. The translation is: 'When the moon is full, hide your cheese.' Take it and go."`,
+            text: `For the first time, she laughs. "Bunnies? My goats are named *Tzitziki* and *Kleftiko*. They would eat your Schnuckel and Hasi for breakfast. But I like you. Here, take the scroll."`,
             options: [{ label: "Take the translation and leave", next: "translationSuccess" }]
         },
         translationSuccess: {
-            text: `You have received the translation. It reads: "Χαλεπὰ τὰ καλά" – "Fine things are difficult." Kalliopi waves you off. "Now go. And next time, bring a better secret."`,
-            options: [{ label: "🔁 Begin again from the start", next: "start" }]
+            text: `She hands you the original papyrus. "Read it carefully. I'll be in the back." You unroll the document and begin to read.`,
+            // We'll render the scroll inside the story card dynamically.
+            options: [
+                { label: "🔁 Begin again from the start", next: "start" }
+            ],
+            // special flag: this node contains a scroll
+            hasScroll: true
         },
         dismissed: {
             text: `The door slams behind you. The wind howls. You are left standing outside, without a translation, feeling thoroughly humbled.`,
@@ -272,12 +318,20 @@
     function render() {
         const node = storyGraph[currentNode];
         if (!node) {
-            document.getElementById("storyText").innerText = "The scholar is silent… (path error)";
+            document.getElementById("storyText").innerHTML = "The scholar is silent… (path error)";
             document.getElementById("choicesContainer").innerHTML = '<button class="choice-btn" onclick="location.reload()">Restart</button>';
             return;
         }
 
-        document.getElementById("storyText").innerText = node.text;
+        // Display main story text
+        const storyDiv = document.getElementById("storyText");
+        if (node.hasScroll) {
+            // Special rendering: show the scroll content
+            storyDiv.innerHTML = `<div class="scroll">${translationText.replace(/\n/g, '<br>')}</div>`;
+        } else {
+            storyDiv.innerText = node.text;
+        }
+
         const choicesDiv = document.getElementById("choicesContainer");
         choicesDiv.innerHTML = "";
 
