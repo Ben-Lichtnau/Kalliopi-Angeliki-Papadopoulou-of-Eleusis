@@ -131,7 +131,7 @@
     const ORACLE_NAME = document.title;
     const DISPLAY_NAME = ORACLE_NAME.replace(/-/g, ' ');
 
-    // ----- Helper: Fisher-Yates shuffle (in-place, deterministic per call)
+    // Helper: Fisher-Yates shuffle (deterministic per call)
     function shuffleArray(arr) {
         for (let i = arr.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -140,7 +140,7 @@
         return arr;
     }
 
-    // ----- Define the 6 secrets (each: label, next-node)
+    // ----- Secrets (original 6, split into two trios)
     const allSecrets = [
         { label: "„I was born in Calama, Chile, but left when I was four because my German parents got work in Germany.“", next: "secret1" },
         { label: "„I am ambidextrous. Look!“ [writes with left hand, combs hair with right]", next: "secret2" },
@@ -149,17 +149,14 @@
         { label: "„I've been vegan since I was fourteen, for all the right reasons.“", next: "secret5" },
         { label: "„I have two bunnies at home – one named Schnuckel, one named Hasi.“", next: "secret6" }
     ];
-
-    // Split into trios (1-3 and 4-6 based on original order)
     const trio1 = allSecrets.slice(0, 3);
     const trio2 = allSecrets.slice(3, 6);
-    // Shuffle each trio individually, then combine
     const shuffledSecrets = [...shuffleArray([...trio1]), ...shuffleArray([...trio2])];
 
-    // ----- Define the 5 context options (2 true, 3 false)
+    // ----- Context options (2 true, 3 false)
     const trueContexts = [
-        { label: "A certain Christopher Illopoly hid a manuscript of an instruction manual.", isValid: true },
-        { label: "It came from the British Museum – a neglected drawer in the basement.", isValid: true }
+        { label: "A certain Christopher Illopoly hid a manuscript of an instruction manual. Or was it the British Museum?", isValid: true },
+        { label: "It's a commentary on Hesiod's Theogony. The author is unclear.", isValid: true }
     ];
     const falseContexts = [
         { label: "It was unearthed in a subterranean library beneath Alexandria, guarded by a silent brotherhood of scribes.", isValid: false },
@@ -168,14 +165,17 @@
     ];
     const allContexts = shuffleArray([...trueContexts, ...falseContexts]);
 
-    // ----- Decision tree
+    // ----- Full decision tree (with original side branches restored)
     const storyGraph = {
         start: {
             text: `As you enter the old stone house, ${DISPLAY_NAME} looks up from a pile of dusty scrolls. She adjusts her glasses. "A visitor? Rare. What brings you to Eleusis?"`,
             options: [
-                { label: "„I seek a translation from ancient Greek.“", next: "askContext" }
+                { label: "„I seek a translation from ancient Greek.“", next: "askContext" },
+                { label: "„Just curiosity. Who are you really?“", next: "whoAreYou" },
+                { label: "„I lost my way. Is there a place to rest?“", next: "rest" }
             ]
         },
+        // ----- Translation path -----
         askContext: {
             text: `She leans back. "A translation? Of which document? These things always come with a story. Where did this text surface?"`,
             options: allContexts.map(ctx => ({
@@ -197,7 +197,7 @@
         },
         warnSecret: {
             text: `She raises a finger. "Before you speak – your secret had better be true. I've studied human deceit for decades. Now, choose one:"`,
-            options: shuffledSecrets  // already shuffled once at page load
+            options: shuffledSecrets
         },
         secret1: {
             text: `She narrows her eyes. "So… do you have a Chilean passport?" You hesitate. "Yes… no… not really." She sniffs the air theatrically. "Liar. I smell the falsehood on you. You've never even been to Calama. Get out of my house." She points to the door.`,
@@ -230,6 +230,40 @@
         dismissed: {
             text: `The door slams behind you. The wind howls. You are left standing outside, without a translation, feeling thoroughly humbled.`,
             options: [{ label: "🔁 Try again from the start", next: "start" }]
+        },
+        // ----- Side branch: Who are you really? -----
+        whoAreYou: {
+            text: `${DISPLAY_NAME} raises an eyebrow. "Some call me a keeper of old things. Others a dreamer. The name you know is only an echo. Do you truly want the truth?"`,
+            options: [
+                { label: "„Yes, I want to know.“", next: "truth" },
+                { label: "„Maybe not after all.“", next: "start" }
+            ]
+        },
+        truth: {
+            text: `She leans forward and whispers: "I am the person who programmed your decision tree. And this dialogue ends right here." A spark in her eyes.`,
+            options: [
+                { label: "„…Touché.“ (Back to the beginning)", next: "start" }
+            ]
+        },
+        // ----- Side branch: Looking for rest -----
+        rest: {
+            text: `"Rest? Sit on that old olive stump over there. But careful – the goats here steal anything that shines." She disappears for a moment and returns with a jug of water. "Are you here because of some ancient text?"`,
+            options: [
+                { label: "„Yes, actually. I need a translation.“", next: "askContext" },
+                { label: "„No, I just wanted to see the landscape.“", next: "landscape" }
+            ]
+        },
+        landscape: {
+            text: `"Then look around. Eleusis is quiet today." She sits next to you and falls silent. After a while she says: "The translation you're not looking for is: 'The yellow liquid is dangerous.'" A final sip of water, then she leaves.`,
+            options: [
+                { label: "Stand up and leave", next: "endRest" }
+            ]
+        },
+        endRest: {
+            text: `The wind sweeps over the hills of Eleusis. You feel the encounter is over. Perhaps it was a dream. Perhaps not.`,
+            options: [
+                { label: "🔁 Begin again from the start", next: "start" }
+            ]
         }
     };
 
