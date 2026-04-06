@@ -117,101 +117,119 @@
 <div class="container">
     <div class="header">
         <h1>⚘ Kalliopi Angeliki Papadopoulou of Eleusis ⚘</h1>
-        <p>τὸ μαντεῖον · the Oracle</p>
+        <p>ἡ λογία · the Scholar</p>
     </div>
 
     <div class="story-card">
-        <div class="story-text" id="storyText">
-            <!-- Dynamic story text -->
-        </div>
+        <div class="story-text" id="storyText"></div>
     </div>
-    <div class="choices-area" id="choicesContainer">
-        <!-- Choice buttons -->
-    </div>
-    <footer>
-        ⋆ The initiates of the Eleusinian Mysteries speak through this place ⋆
-    </footer>
+    <div class="choices-area" id="choicesContainer"></div>
+    <footer>⋆ A quiet place for those who seek old words ⋆</footer>
 </div>
 
 <script>
-    // Oracle name from page title
     const ORACLE_NAME = document.title;
     const DISPLAY_NAME = ORACLE_NAME.replace(/-/g, ' ');
 
-    // Decision tree – all texts in English
+    // ----- Helper: Fisher-Yates shuffle (in-place, deterministic per call)
+    function shuffleArray(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    // ----- Define the 6 secrets (each: label, next-node)
+    const allSecrets = [
+        { label: "„I was born in Calama, Chile, but left when I was four because my German parents got work in Germany.“", next: "secret1" },
+        { label: "„I am ambidextrous. Look!“ [writes with left hand, combs hair with right]", next: "secret2" },
+        { label: "„As a child, I swallowed a 50-cent coin and had to go to the hospital.“", next: "secret3" },
+        { label: "„I have a Greek uncle in politics. Not particularly known, though.“", next: "secret4" },
+        { label: "„I've been vegan since I was fourteen, for all the right reasons.“", next: "secret5" },
+        { label: "„I have two bunnies at home – one named Schnuckel, one named Hasi.“", next: "secret6" }
+    ];
+
+    // Split into trios (1-3 and 4-6 based on original order)
+    const trio1 = allSecrets.slice(0, 3);
+    const trio2 = allSecrets.slice(3, 6);
+    // Shuffle each trio individually, then combine
+    const shuffledSecrets = [...shuffleArray([...trio1]), ...shuffleArray([...trio2])];
+
+    // ----- Define the 5 context options (2 true, 3 false)
+    const trueContexts = [
+        { label: "A certain Christopher Illopoly hid a manuscript of an instruction manual.", isValid: true },
+        { label: "It came from the British Museum – a neglected drawer in the basement.", isValid: true }
+    ];
+    const falseContexts = [
+        { label: "It was unearthed in a subterranean library beneath Alexandria, guarded by a silent brotherhood of scribes.", isValid: false },
+        { label: "A Byzantine emperor's private alchemical diary, sealed in a lead casket.", isValid: false },
+        { label: "A Venetian merchant brought it from Crete in 1453, just before the city fell. It smells of salt and betrayal.", isValid: false }
+    ];
+    const allContexts = shuffleArray([...trueContexts, ...falseContexts]);
+
+    // ----- Decision tree
     const storyGraph = {
         start: {
-            text: `As you walk up the narrow path, the door of an ancient stone house creaks open. ${DISPLAY_NAME} steps out, a laurel wreath in her hair. She looks at you calmly. "A stranger in Eleusis? Your arrival has been whispered for some time." She tilts her head. "What brings you to me?"`,
+            text: `As you enter the old stone house, ${DISPLAY_NAME} looks up from a pile of dusty scrolls. She adjusts her glasses. "A visitor? Rare. What brings you to Eleusis?"`,
             options: [
-                { label: "„I seek the translation of the ancient Greek text from the game.“", next: "seekTranslation" },
-                { label: "„Just curiosity. Who are you really?“", next: "whoAreYou" },
-                { label: "„I lost my way. Is there a place to rest here?“", next: "rest" }
+                { label: "„I seek a translation from ancient Greek.“", next: "askContext" }
             ]
         },
-        seekTranslation: {
-            text: `A quiet smile. "The text you mean … it is no ordinary Greek. It is a riddle of the Mysteries. If you want the translation, you must entrust me with something personal." She waits.`,
+        askContext: {
+            text: `She leans back. "A translation? Of which document? These things always come with a story. Where did this text surface?"`,
+            options: allContexts.map(ctx => ({
+                label: ctx.label,
+                next: ctx.isValid ? "contextTrue" : "contextFalse"
+            }))
+        },
+        contextTrue: {
+            text: `She nods slowly. "Ah, I know what you're getting at. Someone else asked about this before. The translation should still be somewhere around here… But before I give it to you, you must tell me a secret. A real one. I'll know if you lie." She crosses her arms. "Go on."`,
             options: [
-                { label: "Tell her a small secret (make one up).", next: "secretTold" },
-                { label: "„I don't trust strangers with anything.“", next: "refuse" }
+                { label: "Tell her a secret.", next: "warnSecret" }
             ]
         },
-        secretTold: {
-            text: `She nods slowly. "Good. Your honesty honours you. The translation is: 'The key is not made of bronze, but of silence.' I can tell you no more." She turns and steps back into the half-darkness.`,
-            options: [
-                { label: "„Thank you … I'll go.“", next: "end" },
-                { label: "„Wait – one more question!“", next: "desperateQuestion" }
-            ]
-        },
-        desperateQuestion: {
-            text: `She pauses without turning around. "The next answer will cost you a joke. A bad one."`,
-            options: [
-                { label: "„Why did the Greek throw his computer into the Aegean? – Because he wanted Windows on Greek time.“", next: "badJoke" },
-                { label: "„I have no joke.“", next: "refuse" }
-            ]
-        },
-        badJoke: {
-            text: `A short, dry laugh. "Enough. You may leave. Remember: never drink the yellow liquid." She disappears inside.`,
-            options: [
-                { label: "Confused, take the way back", next: "end" }
-            ]
-        },
-        whoAreYou: {
-            text: `${DISPLAY_NAME} raises an eyebrow. "Some call me a keeper of old things. Others a dreamer. The name you know is only an echo. Do you truly want the truth?"`,
-            options: [
-                { label: "„Yes, I want to know.“", next: "truth" },
-                { label: "„Maybe not after all.“", next: "start" }
-            ]
-        },
-        truth: {
-            text: `She leans forward and whispers: "I am the person who programmed your decision tree. And this dialogue ends right here." A spark in her eyes.`,
-            options: [
-                { label: "„…Touché.“ (Back to the beginning)", next: "start" }
-            ]
-        },
-        rest: {
-            text: `"Rest? Sit on that old olive stump over there. But be careful – the goats here steal anything that shines." She disappears for a moment and returns with a jug of water. "Are you here because of the game text? Everyone comes because of it."`,
-            options: [
-                { label: "„Yes, actually.“", next: "seekTranslation" },
-                { label: "„No, I just wanted to see the landscape.“", next: "landscape" }
-            ]
-        },
-        landscape: {
-            text: `"Then look around. Eleusis is quiet today." She sits next to you and falls silent. After a while she says: "The translation you're not looking for is: 'The yellow liquid is dangerous.'" A final sip of water, then she leaves.`,
-            options: [
-                { label: "Stand up and leave", next: "end" }
-            ]
-        },
-        refuse: {
-            text: `${DISPLAY_NAME} shrugs. "Then the translation will remain hidden from you. May your paths lead you safely." She turns – the door falls shut.`,
-            options: [
-                { label: "Disappointed, head off", next: "end" }
-            ]
-        },
-        end: {
-            text: `The wind sweeps over the hills of Eleusis. You feel the encounter is over. Perhaps it was a dream. Perhaps not.`,
+        contextFalse: {
+            text: `She frowns. "I've never heard of that. It sounds like you've fallen for some mystical nonsense. There's so much fabricated rubbish out there. Goodbye." She turns back to her scrolls and ignores you.`,
             options: [
                 { label: "🔁 Begin again from the start", next: "start" }
             ]
+        },
+        warnSecret: {
+            text: `She raises a finger. "Before you speak – your secret had better be true. I've studied human deceit for decades. Now, choose one:"`,
+            options: shuffledSecrets  // already shuffled once at page load
+        },
+        secret1: {
+            text: `She narrows her eyes. "So… do you have a Chilean passport?" You hesitate. "Yes… no… not really." She sniffs the air theatrically. "Liar. I smell the falsehood on you. You've never even been to Calama. Get out of my house." She points to the door.`,
+            options: [{ label: "Leave in shame", next: "dismissed" }]
+        },
+        secret2: {
+            text: `She watches you write with your left hand while combing your hair with your right. Then she grimaces. "You're combing your hair in my study? Disgusting. Have you no manners? Ugh. I'll give you the translation, but only so you leave faster. Here: 'The yellow liquid is not to be drunk.' Now go."`,
+            options: [{ label: "Take the translation and leave", next: "translationSuccess" }]
+        },
+        secret3: {
+            text: `She stares at you blankly. "I don't care. That's not remotely interesting. Children swallow coins all the time. But fine, a secret is a secret. The translation: 'Do not trust a man who sells olive oil from a blue barrel.' There. Happy?"`,
+            options: [{ label: "Take the translation and leave", next: "translationSuccess" }]
+        },
+        secret4: {
+            text: `Her face darkens. "I knew it the moment you walked in. A corrupt little pig. *Vre maláka* – you and your uncle can rot in the same cesspool. Out!" She throws a sandal at you.`,
+            options: [{ label: "Flee", next: "dismissed" }]
+        },
+        secret5: {
+            text: `She rolls her eyes. "That's not even a secret. That's just a dietary preference. Whatever. I'm bored. Here's your translation: 'The fish remembers the hook.' Now please leave me alone."`,
+            options: [{ label: "Take the translation and leave", next: "translationSuccess" }]
+        },
+        secret6: {
+            text: `For the first time, she laughs. "Bunnies? My goats are named *Tzitziki* and *Kleftiko*. They would eat your Schnuckel and Hasi for breakfast. But I like you. The translation is: 'When the moon is full, hide your cheese.' Take it and go."`,
+            options: [{ label: "Take the translation and leave", next: "translationSuccess" }]
+        },
+        translationSuccess: {
+            text: `You have received the translation. It reads: "Χαλεπὰ τὰ καλά" – "Fine things are difficult." Kalliopi waves you off. "Now go. And next time, bring a better secret."`,
+            options: [{ label: "🔁 Begin again from the start", next: "start" }]
+        },
+        dismissed: {
+            text: `The door slams behind you. The wind howls. You are left standing outside, without a translation, feeling thoroughly humbled.`,
+            options: [{ label: "🔁 Try again from the start", next: "start" }]
         }
     };
 
@@ -220,7 +238,7 @@
     function render() {
         const node = storyGraph[currentNode];
         if (!node) {
-            document.getElementById("storyText").innerText = "The Mysteries are silent… (path error)";
+            document.getElementById("storyText").innerText = "The scholar is silent… (path error)";
             document.getElementById("choicesContainer").innerHTML = '<button class="choice-btn" onclick="location.reload()">Restart</button>';
             return;
         }
