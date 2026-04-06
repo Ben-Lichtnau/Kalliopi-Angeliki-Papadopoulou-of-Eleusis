@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kalliopi-Angeliki-Papadopoulou-of-Eleusis</title>
+    <meta name="description" content="She awaits any eager follower. The Eleusinian mysteries are not for the faint of heart." />
     <style>
         * {
             margin: 0;
@@ -116,101 +117,100 @@
 <div class="container">
     <div class="header">
         <h1>⚘ Kalliopi Angeliki Papadopoulou of Eleusis ⚘</h1>
-        <p>τὸ μαντεῖον · das Orakel</p>
+        <p>τὸ μαντεῖον · the Oracle</p>
     </div>
 
     <div class="story-card">
         <div class="story-text" id="storyText">
-            <!-- Dynamischer Text wird hier eingefügt -->
+            <!-- Dynamic story text -->
         </div>
     </div>
     <div class="choices-area" id="choicesContainer">
-        <!-- Buttons werden hier generiert -->
+        <!-- Choice buttons -->
     </div>
     <footer>
-        ⋆ Die Eingeweihten der Mysterien von Eleusis sprechen durch diesen Ort ⋆
+        ⋆ The initiates of the Eleusinian Mysteries speak through this place ⋆
     </footer>
 </div>
 
 <script>
-    // ----- Name wird automatisch aus dem Titel geholt (damit du ihn nur einmal änderst)
-    const ORACLE_NAME = document.title;  // "Kalliopi-Angeliki-Papadopoulou-of-Eleusis"
-    // Formatierter Name für den Fließtext (mit Leerzeichen statt Bindestrichen)
+    // Oracle name from page title
+    const ORACLE_NAME = document.title;
     const DISPLAY_NAME = ORACLE_NAME.replace(/-/g, ' ');
 
-    // ----- Entscheidungsbaum (Placeholder-Dialoge – leicht abänderbar)
+    // Decision tree – all texts in English
     const storyGraph = {
         start: {
-            text: `Als du den schmalen Pfad hinaufsteigst, öffnet sich die Tür eines uralten Hauses aus verwittertem Stein. ${DISPLAY_NAME} tritt heraus, ein Stirnband aus Lorbeer im Haar. Sie mustert dich ruhig. „Ein Fremder in Eleusis? Deine Ankunft wurde längst geflüstert.“ Sie neigt den Kopf. „Was führt dich zu mir?“`,
+            text: `As you walk up the narrow path, the door of an ancient stone house creaks open. ${DISPLAY_NAME} steps out, a laurel wreath in her hair. She looks at you calmly. "A stranger in Eleusis? Your arrival has been whispered for some time." She tilts her head. "What brings you to me?"`,
             options: [
-                { label: "„Ich suche die Übersetzung des altgriechischen Textes aus dem Spiel.“", next: "seekTranslation" },
-                { label: "„Nur Neugier. Wer bist du wirklich?“", next: "whoAreYou" },
-                { label: "„Ich bin vom Weg abgekommen. Gibt es hier einen Ort zu rasten?“", next: "rest" }
+                { label: "„I seek the translation of the ancient Greek text from the game.“", next: "seekTranslation" },
+                { label: "„Just curiosity. Who are you really?“", next: "whoAreYou" },
+                { label: "„I lost my way. Is there a place to rest here?“", next: "rest" }
             ]
         },
         seekTranslation: {
-            text: `Ein stilles Lächeln. „Der Text, den du meinst … er ist kein gewöhnliches Griechisch. Es ist ein Rätsel der Mysterien. Wenn du die Übersetzung willst, musst du mir etwas Persönliches anvertrauen.“ Sie wartet.`,
+            text: `A quiet smile. "The text you mean … it is no ordinary Greek. It is a riddle of the Mysteries. If you want the translation, you must entrust me with something personal." She waits.`,
             options: [
-                { label: "Erzähle eine kleine geheime Begebenheit (erfunden).", next: "secretTold" },
-                { label: "„Ich vertraue Fremden nichts an.“", next: "refuse" }
+                { label: "Tell her a small secret (make one up).", next: "secretTold" },
+                { label: "„I don't trust strangers with anything.“", next: "refuse" }
             ]
         },
         secretTold: {
-            text: `Sie nickt langsam. „Gut. Deine Offenheit ehrt dich. Die Übersetzung lautet: ‚Der Schlüssel ist nicht aus Bronze, sondern aus Schweigen.‘ Mehr kann ich dir nicht sagen.“ Sie dreht sich um und tritt zurück ins Halbdunkel.`,
+            text: `She nods slowly. "Good. Your honesty honours you. The translation is: 'The key is not made of bronze, but of silence.' I can tell you no more." She turns and steps back into the half-darkness.`,
             options: [
-                { label: "„Danke … ich gehe.“", next: "end" },
-                { label: "„Warte – noch eine Frage!“", next: "desperateQuestion" }
+                { label: "„Thank you … I'll go.“", next: "end" },
+                { label: "„Wait – one more question!“", next: "desperateQuestion" }
             ]
         },
         desperateQuestion: {
-            text: `Sie hält inne, ohne sich umzudrehen. „Die nächste Antwort kostet dich einen Witz. Einen schlechten.“`,
+            text: `She pauses without turning around. "The next answer will cost you a joke. A bad one."`,
             options: [
-                { label: "„Warum hat der Grieche seinen Computer in die Ägäis geworfen? – Weil er Windows lieber auf Griechisch hatte.“", next: "badJoke" },
-                { label: "„Ich habe keinen Witz.“", next: "refuse" }
+                { label: "„Why did the Greek throw his computer into the Aegean? – Because he wanted Windows on Greek time.“", next: "badJoke" },
+                { label: "„I have no joke.“", next: "refuse" }
             ]
         },
         badJoke: {
-            text: `Ein kurzes, trockenes Lachen. „Genug. Du darfst gehen. Denk daran: Trinke nie den gelben Saft.“ Sie verschwindet im Inneren.`,
+            text: `A short, dry laugh. "Enough. You may leave. Remember: never drink the yellow liquid." She disappears inside.`,
             options: [
-                { label: "Verwirrt den Rückweg antreten", next: "end" }
+                { label: "Confused, take the way back", next: "end" }
             ]
         },
         whoAreYou: {
-            text: `${DISPLAY_NAME} hebt eine Augenbraue. „Manche nennen mich eine Hüterin alter Dinge. Andere eine Träumerin. Der Name, den du kennst, ist nur ein Echo. Willst du wirklich die Wahrheit wissen?“`,
+            text: `${DISPLAY_NAME} raises an eyebrow. "Some call me a keeper of old things. Others a dreamer. The name you know is only an echo. Do you truly want the truth?"`,
             options: [
-                { label: "„Ja, ich will es wissen.“", next: "truth" },
-                { label: "„Vielleicht doch lieber nicht.“", next: "start" }
+                { label: "„Yes, I want to know.“", next: "truth" },
+                { label: "„Maybe not after all.“", next: "start" }
             ]
         },
         truth: {
-            text: `Sie beugt sich vor und flüstert: „Ich bin die Person, die deinen Entscheidungsbaum programmiert hat. Und dieser Dialog endet hier.“ Ein Funkeln in ihren Augen.`,
+            text: `She leans forward and whispers: "I am the person who programmed your decision tree. And this dialogue ends right here." A spark in her eyes.`,
             options: [
-                { label: "„…Touché.“ (Zurück zum Anfang)", next: "start" }
+                { label: "„…Touché.“ (Back to the beginning)", next: "start" }
             ]
         },
         rest: {
-            text: `„Rast finden? Setz dich auf den alten Olivenstumpf da drüben. Aber pass auf – die Ziegen hier stehlen alles, was glänzt.“ Sie verschwindet kurz und bringt einen Krug mit Wasser. „Bist du wegen des Spieltextes gekommen? Jeder kommt deswegen.“`,
+            text: `"Rest? Sit on that old olive stump over there. But be careful – the goats here steal anything that shines." She disappears for a moment and returns with a jug of water. "Are you here because of the game text? Everyone comes because of it."`,
             options: [
-                { label: "„Ja, eigentlich schon.“", next: "seekTranslation" },
-                { label: "„Nein, ich wollte nur die Landschaft sehen.“", next: "landscape" }
+                { label: "„Yes, actually.“", next: "seekTranslation" },
+                { label: "„No, I just wanted to see the landscape.“", next: "landscape" }
             ]
         },
         landscape: {
-            text: `„Dann schau dich um. Eleusis ist still heute.“ Sie setzt sich neben dich und schweigt. Nach einer Weile sagt sie: „Die Übersetzung, die du nicht suchst, lautet: ‚Der gelbe Saft ist gefährlich.‘“ Ein letzter Schluck Wasser, dann geht sie.`,
+            text: `"Then look around. Eleusis is quiet today." She sits next to you and falls silent. After a while she says: "The translation you're not looking for is: 'The yellow liquid is dangerous.'" A final sip of water, then she leaves.`,
             options: [
-                { label: "Aufstehen und gehen", next: "end" }
+                { label: "Stand up and leave", next: "end" }
             ]
         },
         refuse: {
-            text: `${DISPLAY_NAME} zuckt mit den Schultern. „Dann bleibt dir die Übersetzung verborgen. Mögen deine Wege dich sicher führen.“ Sie dreht sich um – die Tür fällt ins Schloss.`,
+            text: `${DISPLAY_NAME} shrugs. "Then the translation will remain hidden from you. May your paths lead you safely." She turns – the door falls shut.`,
             options: [
-                { label: "Enttäuscht das Weite suchen", next: "end" }
+                { label: "Disappointed, head off", next: "end" }
             ]
         },
         end: {
-            text: `Der Wind streicht über die Hügel von Eleusis. Du spürst, dass die Begegnung vorbei ist. Vielleicht war es ein Traum. Vielleicht nicht.`,
+            text: `The wind sweeps over the hills of Eleusis. You feel the encounter is over. Perhaps it was a dream. Perhaps not.`,
             options: [
-                { label: "🔁 Noch einmal von vorn beginnen", next: "start" }
+                { label: "🔁 Begin again from the start", next: "start" }
             ]
         }
     };
@@ -220,9 +220,8 @@
     function render() {
         const node = storyGraph[currentNode];
         if (!node) {
-            // Fallback falls Knoten fehlt
-            document.getElementById("storyText").innerText = "Die Mysterien schweigen … (Fehler im Pfad)";
-            document.getElementById("choicesContainer").innerHTML = '<button class="choice-btn" onclick="location.reload()">Neustart</button>';
+            document.getElementById("storyText").innerText = "The Mysteries are silent… (path error)";
+            document.getElementById("choicesContainer").innerHTML = '<button class="choice-btn" onclick="location.reload()">Restart</button>';
             return;
         }
 
@@ -231,10 +230,9 @@
         choicesDiv.innerHTML = "";
 
         if (!node.options || node.options.length === 0) {
-            // Sollte nicht passieren, aber Sicherheit
             const resetBtn = document.createElement("button");
             resetBtn.className = "choice-btn";
-            resetBtn.innerText = "Von vorn beginnen";
+            resetBtn.innerText = "Begin again";
             resetBtn.onclick = () => {
                 currentNode = "start";
                 render();
