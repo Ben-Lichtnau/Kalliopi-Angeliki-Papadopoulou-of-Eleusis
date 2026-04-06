@@ -67,7 +67,6 @@
             font-weight: 450;
         }
 
-        /* Scroll / parchment style for the translation */
         .scroll {
             background: #fef7e0;
             padding: 1.8rem;
@@ -155,7 +154,6 @@
     const ORACLE_NAME = document.title;
     const DISPLAY_NAME = ORACLE_NAME.replace(/-/g, ' ');
 
-    // Helper: Fisher-Yates shuffle (deterministic per call)
     function shuffleArray(arr) {
         for (let i = arr.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -189,8 +187,8 @@
     ];
     const allContexts = shuffleArray([...trueContexts, ...falseContexts]);
 
-    // ----- The authentic translation text
-    const translationText = `You begin to read the fragile papyrus. The ink has faded, but the words are still clear:
+    // ----- Translation text (no "fragile papyrus")
+    const translationText = `You begin to read the translation. The words are clear:
 
 "That the world was born without tongue is no accident of myth but a statement of method. Chaos did not suggest the earth. It demanded it. And so too must the laws that govern any realm — even one so modest as a game of cards played by candlelight or, as I suppose elsewhere, by the pale glow of a dying hearth — be understood not as suggestions offered in the spirit of friendship, but as edicts. Hard. Unyielding. Cut into the bones of the thing.
 
@@ -206,39 +204,110 @@ There follows now a passage that I suspect will cause some obscurity, for I addr
 
 Go now. Read what has been written. Think on what has not. And where the text is silent, do not mistake its silence for absence. It is waiting for you to speak."`;
 
-    // ----- Decision tree (full, with restored side branches)
+    // ----- Decision tree with new side branches
     const storyGraph = {
         start: {
             text: `As you enter the old stone house, ${DISPLAY_NAME} looks up from a pile of dusty scrolls. She adjusts her glasses. "A visitor? Rare. What brings you to Eleusis?"`,
             options: [
                 { label: "„I seek a translation from ancient Greek.“", next: "askContext" },
                 { label: "„Just curiosity. Who are you really?“", next: "whoAreYou" },
-                { label: "„I lost my way. Is there a place to rest?“", next: "rest" }
+                { label: "„I lost my way. Is there a place to rest?“", next: "rest" },
+                { label: "„I'm here to ask about your goats.“", next: "goatBranch" },
+                // Two new funny start branches
+                { label: "„I'm looking for a lost sandal.“", next: "sandalBranch" },
+                { label: "„Do you know the way to Delphi?“", next: "delphiBranch" }
             ]
         },
-        // ----- Translation path -----
+        // Sandal branch
+        sandalBranch: {
+            text: `She stares at your feet. "You're wearing two sandals. Both appear intact. Why would you need another?" You explain that it's a sentimental sandal. She sighs. "I have a box of lost sandals under the stairs. Mostly left ones. Take a look. But don't expect to find yours." She turns away.`,
+            options: [{ label: "Search the box (find nothing)", next: "sandalEnd" }]
+        },
+        sandalEnd: {
+            text: `After ten minutes of rummaging through dusty, mismatched sandals, you give up. "Not here," she says without looking up. "Goodbye."`,
+            options: [{ label: "🔁 Begin again", next: "start" }]
+        },
+        // Delphi branch
+        delphiBranch: {
+            text: `She laughs dryly. "Delphi? That's three days' walk. And they charge tourists a fortune for oracles. I can give you a fake prophecy for half the price." You decline. "Then why are you here?" You have no answer.`,
+            options: [{ label: "Shrug and leave", next: "delphiEnd" }]
+        },
+        delphiEnd: {
+            text: `She mutters "Strangers" and returns to her scrolls. The door closes behind you.`,
+            options: [{ label: "🔁 Begin again", next: "start" }]
+        },
+        // Goat branch (existing, kept)
+        goatBranch: {
+            text: `She sighs. "The goats again. Yes, I have two: Tzitziki and Kleftiko. They are terrible beasts. Last week they ate a philosopher's hat. The week before, they headbutted a tax collector into a well." She looks at you sternly. "Was that all?"`,
+            options: [
+                { label: "„I… I just like goats.“", next: "goatEnd" },
+                { label: "„Do they give good milk?“", next: "goatEnd2" }
+            ]
+        },
+        goatEnd: {
+            text: `"Then you are simple. But harmless. Now leave before they mistake you for a snack." She points to the door.`,
+            options: [{ label: "🔁 Begin again", next: "start" }]
+        },
+        goatEnd2: {
+            text: `"Their milk is terrible. It tastes of regret and stolen olives. Goodbye." She turns back to her scrolls.`,
+            options: [{ label: "🔁 Begin again", next: "start" }]
+        },
+        // ----- Main translation path with two new funny options inside askContext
         askContext: {
             text: `She leans back. "A translation? Of which document? These things always come with a story. Where did this text surface?"`,
-            options: allContexts.map(ctx => ({
-                label: ctx.label,
-                next: ctx.isValid ? "contextTrue" : "contextFalse"
-            }))
+            options: [
+                ...allContexts.map(ctx => ({
+                    label: ctx.label,
+                    next: ctx.isValid ? "contextTrue" : "contextFalse"
+                })),
+                { label: "„Actually, never mind. I have a funny story about a broken amphora.“", next: "jokeBranch" },
+                // Two new funny main-line branches
+                { label: "„It's a recipe for lentil soup. Very old lentils.“", next: "lentilBranch" },
+                { label: "„A love letter to a goat. Don't ask.“", next: "loveLetterBranch" }
+            ]
         },
+        // Lentil branch
+        lentilBranch: {
+            text: `She blinks. "A lentil soup recipe? From ancient Greek? That would just say: 'Boil lentils. Add salt. Regret everything.' I don't need to translate that. Good day."`,
+            options: [{ label: "🔁 Begin again", next: "start" }]
+        },
+        // Love letter branch
+        loveLetterBranch: {
+            text: `For the first time, she looks genuinely uncomfortable. "I… I don't want to know. Please leave before I lose my faith in scholarship." She pushes you toward the door.`,
+            options: [{ label: "🔁 Begin again", next: "start" }]
+        },
+        // Existing joke branch
+        jokeBranch: {
+            text: `She crosses her arms. "A story? Fine. Impress me." You tell her how you once tried to carry an amphora of olive oil, tripped, and it shattered. The oil flooded a small temple, and a priest slipped and cursed your family for three generations. She stares blankly. "That's not funny. That's just sad. But I admire your willingness to embarrass yourself. Now go."`,
+            options: [{ label: "🔁 Begin again", next: "start" }]
+        },
+        // ----- Rest of the tree
         contextTrue: {
             text: `She nods slowly. "Ah, I know what you're getting at. Someone else asked about this before. The translation should still be somewhere around here… But before I give it to you, you must tell me a secret. A real one. I'll know if you lie." She crosses her arms. "Go on."`,
-            options: [
-                { label: "Tell her a secret.", next: "warnSecret" }
-            ]
+            options: [{ label: "Tell her a secret.", next: "warnSecret" }]
         },
         contextFalse: {
             text: `She frowns. "I've never heard of that. It sounds like you've fallen for some mystical nonsense. There's so much fabricated rubbish out there. Goodbye." She turns back to her scrolls and ignores you.`,
-            options: [
-                { label: "🔁 Begin again from the start", next: "start" }
-            ]
+            options: [{ label: "🔁 Begin again from the start", next: "start" }]
         },
         warnSecret: {
             text: `She raises a finger. "Before you speak – your secret had better be true. I've studied human deceit for decades. Now, choose one:"`,
-            options: shuffledSecrets
+            options: [
+                ...shuffledSecrets,
+                // Two additional funny options that are not secrets
+                { label: "„I forgot my secret. Can I tell you a pun instead?“", next: "punBranch" },
+                { label: "„I'll sing you a song about a broken amphora.“", next: "songBranch" }
+            ]
+        },
+        // Pun branch
+        punBranch: {
+            text: `"A pun? Fine." You say: "Why did the Greek philosopher refuse to eat lentils? Because he had too many *lentil* crises." She stares at you for five seconds. "That's not a pun. That's a crime. Leave."`,
+            options: [{ label: "🔁 Begin again", next: "start" }]
+        },
+        // Song branch
+        songBranch: {
+            text: `You begin to sing a tuneless melody about olive oil, a broken jar, and a priest's curse. Halfway through, she holds up her hand. "Stop. I'll give you the translation just to make you quiet. Here – take it." She throws a scroll at you. You unroll it. It's blank. "Oh. Out of ink. Now go."`,
+            options: [{ label: "🔁 Begin again", next: "start" }]
         },
         secret1: {
             text: `She narrows her eyes. "So… do you have a Chilean passport?" You hesitate. "Yes… no… not really." She sniffs the air theatrically. "Liar. I smell the falsehood on you. You've never even been to Calama. Get out of my house." She points to the door.`,
@@ -265,19 +334,14 @@ Go now. Read what has been written. Think on what has not. And where the text is
             options: [{ label: "Take the translation and leave", next: "translationSuccess" }]
         },
         translationSuccess: {
-            text: `She hands you the original papyrus. "Read it carefully. I'll be in the back." You unroll the document and begin to read.`,
-            // We'll render the scroll inside the story card dynamically.
-            options: [
-                { label: "🔁 Begin again from the start", next: "start" }
-            ],
-            // special flag: this node contains a scroll
+            text: `She hands you the scroll. "Read it carefully. I'll be in the back." You unroll the document and begin to read.`,
+            options: [{ label: "🔁 Begin again from the start", next: "start" }],
             hasScroll: true
         },
         dismissed: {
             text: `The door slams behind you. The wind howls. You are left standing outside, without a translation, feeling thoroughly humbled.`,
             options: [{ label: "🔁 Try again from the start", next: "start" }]
         },
-        // ----- Side branch: Who are you really? -----
         whoAreYou: {
             text: `${DISPLAY_NAME} raises an eyebrow. "Some call me a keeper of old things. Others a dreamer. The name you know is only an echo. Do you truly want the truth?"`,
             options: [
@@ -287,11 +351,8 @@ Go now. Read what has been written. Think on what has not. And where the text is
         },
         truth: {
             text: `She leans forward and whispers: "I am the person who programmed your decision tree. And this dialogue ends right here." A spark in her eyes.`,
-            options: [
-                { label: "„…Touché.“ (Back to the beginning)", next: "start" }
-            ]
+            options: [{ label: "„…Touché.“ (Back to the beginning)", next: "start" }]
         },
-        // ----- Side branch: Looking for rest -----
         rest: {
             text: `"Rest? Sit on that old olive stump over there. But careful – the goats here steal anything that shines." She disappears for a moment and returns with a jug of water. "Are you here because of some ancient text?"`,
             options: [
@@ -301,15 +362,11 @@ Go now. Read what has been written. Think on what has not. And where the text is
         },
         landscape: {
             text: `"Then look around. Eleusis is quiet today." She sits next to you and falls silent. After a while she says: "The translation you're not looking for is: 'The yellow liquid is dangerous.'" A final sip of water, then she leaves.`,
-            options: [
-                { label: "Stand up and leave", next: "endRest" }
-            ]
+            options: [{ label: "Stand up and leave", next: "endRest" }]
         },
         endRest: {
             text: `The wind sweeps over the hills of Eleusis. You feel the encounter is over. Perhaps it was a dream. Perhaps not.`,
-            options: [
-                { label: "🔁 Begin again from the start", next: "start" }
-            ]
+            options: [{ label: "🔁 Begin again from the start", next: "start" }]
         }
     };
 
@@ -323,10 +380,8 @@ Go now. Read what has been written. Think on what has not. And where the text is
             return;
         }
 
-        // Display main story text
         const storyDiv = document.getElementById("storyText");
         if (node.hasScroll) {
-            // Special rendering: show the scroll content
             storyDiv.innerHTML = `<div class="scroll">${translationText.replace(/\n/g, '<br>')}</div>`;
         } else {
             storyDiv.innerText = node.text;
