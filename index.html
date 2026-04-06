@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalliopi-Angeliki-Papadopoulou-of-Eleusis</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f4f0e6;
+            font-family: 'Segoe UI', 'Georgia', 'Times New Roman', serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 700px;
+            width: 100%;
+            background: #fffef7;
+            border-radius: 24px;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            border: 1px solid #e6dfcf;
+        }
+
+        .header {
+            background: #2c2b28;
+            color: #f0e8d5;
+            padding: 1.2rem 1.8rem;
+            text-align: center;
+            border-bottom: 3px solid #b89a6b;
+        }
+
+        .header h1 {
+            font-size: 1.3rem;
+            font-weight: 400;
+            letter-spacing: 1px;
+            word-break: break-word;
+        }
+
+        .header p {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            margin-top: 6px;
+            font-family: monospace;
+        }
+
+        .story-card {
+            padding: 2rem 1.8rem;
+            background: #ffffff;
+            border-bottom: 1px solid #ede6d9;
+        }
+
+        .story-text {
+            font-size: 1.2rem;
+            line-height: 1.5;
+            color: #2d2a24;
+            font-weight: 450;
+        }
+
+        .choices-area {
+            padding: 1.2rem 1.8rem 2rem 1.8rem;
+            background: #fefcf7;
+        }
+
+        .choice-btn {
+            display: block;
+            width: 100%;
+            margin-bottom: 0.8rem;
+            padding: 0.9rem 1.2rem;
+            background: #f1ede4;
+            border: 1px solid #dbd2c2;
+            border-radius: 40px;
+            font-size: 1rem;
+            font-family: inherit;
+            color: #3a352c;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .choice-btn:hover {
+            background: #e7dfd2;
+            border-color: #b89a6b;
+            transform: translateX(4px);
+        }
+
+        .choice-btn:active {
+            background: #d9cebc;
+        }
+
+        footer {
+            font-size: 0.7rem;
+            text-align: center;
+            padding: 1rem;
+            color: #a39b8a;
+            border-top: 1px solid #ede6d9;
+            background: #fefcf7;
+        }
+
+        @media (max-width: 500px) {
+            .story-text { font-size: 1rem; }
+            .header h1 { font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>⚘ Kalliopi Angeliki Papadopoulou of Eleusis ⚘</h1>
+        <p>τὸ μαντεῖον · das Orakel</p>
+    </div>
+
+    <div class="story-card">
+        <div class="story-text" id="storyText">
+            <!-- Dynamischer Text wird hier eingefügt -->
+        </div>
+    </div>
+    <div class="choices-area" id="choicesContainer">
+        <!-- Buttons werden hier generiert -->
+    </div>
+    <footer>
+        ⋆ Die Eingeweihten der Mysterien von Eleusis sprechen durch diesen Ort ⋆
+    </footer>
+</div>
+
+<script>
+    // ----- Name wird automatisch aus dem Titel geholt (damit du ihn nur einmal änderst)
+    const ORACLE_NAME = document.title;  // "Kalliopi-Angeliki-Papadopoulou-of-Eleusis"
+    // Formatierter Name für den Fließtext (mit Leerzeichen statt Bindestrichen)
+    const DISPLAY_NAME = ORACLE_NAME.replace(/-/g, ' ');
+
+    // ----- Entscheidungsbaum (Placeholder-Dialoge – leicht abänderbar)
+    const storyGraph = {
+        start: {
+            text: `Als du den schmalen Pfad hinaufsteigst, öffnet sich die Tür eines uralten Hauses aus verwittertem Stein. ${DISPLAY_NAME} tritt heraus, ein Stirnband aus Lorbeer im Haar. Sie mustert dich ruhig. „Ein Fremder in Eleusis? Deine Ankunft wurde längst geflüstert.“ Sie neigt den Kopf. „Was führt dich zu mir?“`,
+            options: [
+                { label: "„Ich suche die Übersetzung des altgriechischen Textes aus dem Spiel.“", next: "seekTranslation" },
+                { label: "„Nur Neugier. Wer bist du wirklich?“", next: "whoAreYou" },
+                { label: "„Ich bin vom Weg abgekommen. Gibt es hier einen Ort zu rasten?“", next: "rest" }
+            ]
+        },
+        seekTranslation: {
+            text: `Ein stilles Lächeln. „Der Text, den du meinst … er ist kein gewöhnliches Griechisch. Es ist ein Rätsel der Mysterien. Wenn du die Übersetzung willst, musst du mir etwas Persönliches anvertrauen.“ Sie wartet.`,
+            options: [
+                { label: "Erzähle eine kleine geheime Begebenheit (erfunden).", next: "secretTold" },
+                { label: "„Ich vertraue Fremden nichts an.“", next: "refuse" }
+            ]
+        },
+        secretTold: {
+            text: `Sie nickt langsam. „Gut. Deine Offenheit ehrt dich. Die Übersetzung lautet: ‚Der Schlüssel ist nicht aus Bronze, sondern aus Schweigen.‘ Mehr kann ich dir nicht sagen.“ Sie dreht sich um und tritt zurück ins Halbdunkel.`,
+            options: [
+                { label: "„Danke … ich gehe.“", next: "end" },
+                { label: "„Warte – noch eine Frage!“", next: "desperateQuestion" }
+            ]
+        },
+        desperateQuestion: {
+            text: `Sie hält inne, ohne sich umzudrehen. „Die nächste Antwort kostet dich einen Witz. Einen schlechten.“`,
+            options: [
+                { label: "„Warum hat der Grieche seinen Computer in die Ägäis geworfen? – Weil er Windows lieber auf Griechisch hatte.“", next: "badJoke" },
+                { label: "„Ich habe keinen Witz.“", next: "refuse" }
+            ]
+        },
+        badJoke: {
+            text: `Ein kurzes, trockenes Lachen. „Genug. Du darfst gehen. Denk daran: Trinke nie den gelben Saft.“ Sie verschwindet im Inneren.`,
+            options: [
+                { label: "Verwirrt den Rückweg antreten", next: "end" }
+            ]
+        },
+        whoAreYou: {
+            text: `${DISPLAY_NAME} hebt eine Augenbraue. „Manche nennen mich eine Hüterin alter Dinge. Andere eine Träumerin. Der Name, den du kennst, ist nur ein Echo. Willst du wirklich die Wahrheit wissen?“`,
+            options: [
+                { label: "„Ja, ich will es wissen.“", next: "truth" },
+                { label: "„Vielleicht doch lieber nicht.“", next: "start" }
+            ]
+        },
+        truth: {
+            text: `Sie beugt sich vor und flüstert: „Ich bin die Person, die deinen Entscheidungsbaum programmiert hat. Und dieser Dialog endet hier.“ Ein Funkeln in ihren Augen.`,
+            options: [
+                { label: "„…Touché.“ (Zurück zum Anfang)", next: "start" }
+            ]
+        },
+        rest: {
+            text: `„Rast finden? Setz dich auf den alten Olivenstumpf da drüben. Aber pass auf – die Ziegen hier stehlen alles, was glänzt.“ Sie verschwindet kurz und bringt einen Krug mit Wasser. „Bist du wegen des Spieltextes gekommen? Jeder kommt deswegen.“`,
+            options: [
+                { label: "„Ja, eigentlich schon.“", next: "seekTranslation" },
+                { label: "„Nein, ich wollte nur die Landschaft sehen.“", next: "landscape" }
+            ]
+        },
+        landscape: {
+            text: `„Dann schau dich um. Eleusis ist still heute.“ Sie setzt sich neben dich und schweigt. Nach einer Weile sagt sie: „Die Übersetzung, die du nicht suchst, lautet: ‚Der gelbe Saft ist gefährlich.‘“ Ein letzter Schluck Wasser, dann geht sie.`,
+            options: [
+                { label: "Aufstehen und gehen", next: "end" }
+            ]
+        },
+        refuse: {
+            text: `${DISPLAY_NAME} zuckt mit den Schultern. „Dann bleibt dir die Übersetzung verborgen. Mögen deine Wege dich sicher führen.“ Sie dreht sich um – die Tür fällt ins Schloss.`,
+            options: [
+                { label: "Enttäuscht das Weite suchen", next: "end" }
+            ]
+        },
+        end: {
+            text: `Der Wind streicht über die Hügel von Eleusis. Du spürst, dass die Begegnung vorbei ist. Vielleicht war es ein Traum. Vielleicht nicht.`,
+            options: [
+                { label: "🔁 Noch einmal von vorn beginnen", next: "start" }
+            ]
+        }
+    };
+
+    let currentNode = "start";
+
+    function render() {
+        const node = storyGraph[currentNode];
+        if (!node) {
+            // Fallback falls Knoten fehlt
+            document.getElementById("storyText").innerText = "Die Mysterien schweigen … (Fehler im Pfad)";
+            document.getElementById("choicesContainer").innerHTML = '<button class="choice-btn" onclick="location.reload()">Neustart</button>';
+            return;
+        }
+
+        document.getElementById("storyText").innerText = node.text;
+        const choicesDiv = document.getElementById("choicesContainer");
+        choicesDiv.innerHTML = "";
+
+        if (!node.options || node.options.length === 0) {
+            // Sollte nicht passieren, aber Sicherheit
+            const resetBtn = document.createElement("button");
+            resetBtn.className = "choice-btn";
+            resetBtn.innerText = "Von vorn beginnen";
+            resetBtn.onclick = () => {
+                currentNode = "start";
+                render();
+            };
+            choicesDiv.appendChild(resetBtn);
+            return;
+        }
+
+        node.options.forEach(opt => {
+            const btn = document.createElement("button");
+            btn.className = "choice-btn";
+            btn.innerText = opt.label;
+            btn.onclick = () => {
+                currentNode = opt.next;
+                render();
+            };
+            choicesDiv.appendChild(btn);
+        });
+    }
+
+    render();
+</script>
+</body>
+</html>
